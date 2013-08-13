@@ -62,3 +62,8 @@ Thumbs.db
 .pdf
 */Rapport/tmp/**/*
 !*Rapport/pictures/**/*
+
+#vim stuff
+#######
+*.gch
+*.swp
