@@ -8,7 +8,9 @@
 #include <glm/gtx/transform.hpp>
 #include <cstring>
 //project headers
+#include "globals.hpp"
 #include "tetrahedron.hpp"
+#include "quadcopter.hpp"
 
 const char* VertexText = " \n\
 #version 140 \n\
@@ -29,7 +31,6 @@ void main() {\n\
 	FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n\
 }\n";
 
-GLuint uniformLocation;
 
 void addShader( GLuint shaderProgram, const char* source, GLenum shaderType ) {
 	//create the shader object identifier
@@ -155,6 +156,7 @@ int main() {
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f  );
 
 	Tetrahedron tetra;
+	Quadcopter quad;
 
 	initShaders();
 
@@ -178,6 +180,7 @@ int main() {
 	viewMatrix = cameraMatrix;
 	int count;
 	sf::Clock timer;
+	sf::Clock simTime;
 	while( running ) {
 		if ( clock.getElapsedTime() < sf::milliseconds( 16 ) )
 			continue;
@@ -185,20 +188,21 @@ int main() {
 		count++;
 		if ( count >= 60 ) {
 			count = 0;
-			std::cout << timer.getElapsedTime().asSeconds() << std::endl;
+			//std::cout << timer.getElapsedTime().asSeconds() << std::endl;
 			timer.restart();
 		}
 		clock.restart();
 
+		quad.update( simTime.getElapsedTime().asSeconds() );
 		scale += 0.010f;
 		glm::mat4 projectionMatrix = glm::perspective( 70.0f, (float)width/height, 0.1f, 100.0f );
-		cameraMatrix = glm::lookAt( glm::vec3(  10.0f, 0.0f,  10.0f  ), glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		cameraMatrix = glm::lookAt( glm::vec3(  quad.xPos +1.0f, quad.yPos +1.0f,  quad.zPos -3.0f  ), glm::vec3( quad.xPos, quad.yPos, quad.zPos ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
 		translationMatrix = glm::translate( 0.0f, 0.0f , 0.0f  );
 		rotationMatrix = glm::rotate( 100 * scale , glm::vec3( 1.0, 1.0, 1.0 ) );
 		scalingMatrix = glm::scale( 1.0, 1.0, 1.0 );
 		srt = translationMatrix * rotationMatrix * scalingMatrix;
 		mvp = projectionMatrix * cameraMatrix * srt;
-		glUniformMatrix4fv( uniformLocation, 1, GL_TRUE, &mvp[0][0] );
+		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
 
 		sf::Event event;
 		while( window.pollEvent( event ) ) {
@@ -213,7 +217,16 @@ int main() {
 
 		glClear( GL_COLOR_BUFFER_BIT );
 
-		tetra.render();
+
+		srt = quad.getModelMatrix();
+		mvp = projectionMatrix * cameraMatrix * srt;
+		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
+		quad.render();
+
+		srt = quad.path.getModelMatrix();
+		mvp = projectionMatrix * cameraMatrix * srt;
+		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
+		quad.path.render();
 		//swap buffers, displaying the backbuffer
 		window.display();
 	} 

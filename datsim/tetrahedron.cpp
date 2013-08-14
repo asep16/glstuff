@@ -4,10 +4,10 @@
 
 Tetrahedron::Tetrahedron() {
 	//initialise vertex and index buffer
-	float Vertices[] = { -0.8f, -0.8f, 0.0f,
-						 0.0f, 0.0f, -1.4f,
-						 0.8f, -0.8f, 0.0f,
-						 0.0f, 0.80f, 0.f };
+	float Vertices[] = { -0.8f, -0.8f, -0.4f,
+						 0.0f, 0.0f, 0.4f,
+						 0.8f, -0.8f, -0.4f,
+						 0.0f, 1.13f, -0.4f };
 	unsigned int Indices[] = { 0, 3, 1,
 							   1, 3, 2,
 							   2, 3, 0,
