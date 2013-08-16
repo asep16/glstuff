@@ -7,11 +7,14 @@ Tetrahedron::Tetrahedron() {
 	float Vertices[] = { -0.8f, -0.8f, -0.4f,
 						 0.0f, 0.0f, 0.4f,
 						 0.8f, -0.8f, -0.4f,
-						 0.0f, 1.13f, -0.4f };
+						 0.0f, 1.13f, -0.4f }; /*,
+						 0.0f, 0.0f, 0.0f }; */
 	unsigned int Indices[] = { 0, 3, 1,
 							   1, 3, 2,
 							   2, 3, 0,
-							   0, 2, 1	};
+							   0, 2, 1 }; /*,
+							   1, 2, 4,
+							   4, 3, 0	}; */
 
 	//vertex Buffer
 	glGenBuffers( 1, &VBO );

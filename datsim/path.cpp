@@ -30,7 +30,7 @@ void Path::render() {
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 
-	glDrawArrays( GL_LINE_STRIP, 0, pathData[0].size()  );
+	glDrawArrays( GL_LINE_STRIP, std::max( pathIndex - 500, 0 ), 500  );
 
 	glDisableVertexAttribArray( 0 );
 }
@@ -49,10 +49,12 @@ std::vector< float > Path::getPositionInterpolation( float elapsedTime ) {
 			break;
 		}
 
-		if ( pathData[ 0 ][ index ] < elapsedTime )
-			index++;
-		else
+		if ( pathData[ 0 ][ index ] > elapsedTime ) {
 			found = true;
+			index--;
+		}
+		else
+			index++;
 	}
 
 	int deltaTime = 0;
@@ -67,10 +69,15 @@ std::vector< float > Path::getPositionInterpolation( float elapsedTime ) {
 			result.push_back( pathData[ i ][ index ] + ( pathData[ i ][ index + 1 ] - pathData[ i ][ index ] ) * deltaTime );
 		}
 	}
-	else
+	else {
+		result.push_back( pathData[ 0 ][ maxIndex ] );
 		for ( int i = 1; i < 7; i++ ) {
 			result.push_back( pathData[ i ][ maxIndex ] );
 		}
+	}
+	std::cout <<  result[ 0 ] << " " << elapsedTime << " " << index << " " << result[ 3 ] << std::endl;
+	pathIndex = index;
+	maxPathIndex = maxIndex;
 	return result;
 }
 		

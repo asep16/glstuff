@@ -11,6 +11,8 @@ class Path
 private:
 	GLuint VBO;
 public:
+	int maxPathIndex;
+	int pathIndex;
 	Path();
 	std::vector< float > getPositionInterpolation( float elapsedTime );
 	std::vector< std::vector< float > > pathData;

@@ -227,6 +227,7 @@ int main() {
 		mvp = projectionMatrix * cameraMatrix * srt;
 		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
 		quad.path.render();
+		//gluCylinder( gluNewQuadric(), 2, 2, 2, 32, 32 );
 		//swap buffers, displaying the backbuffer
 		window.display();
 	} 
