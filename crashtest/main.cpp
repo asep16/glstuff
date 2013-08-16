@@ -9,6 +9,94 @@
 #include <cstring>
 
 
+const char* VertexText = " \n\
+#version 140 \n\
+\n\
+in vec3 in_Position; \n\
+\n\
+void main() { \n\
+	gl_Position = vec4( in_Position, 1.0 );\n\
+}\n";
+
+const char* FragmentText = " \n\
+#version 140\n\
+\n\
+out vec4 FragColor;\n\
+\n\
+void main() {\n\
+	FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n\
+}\n";
+
+
+void addShader( GLuint shaderProgram, const char* source, GLenum shaderType ) {
+	//create the shader object identifier
+	GLuint shaderObj = glCreateShader( shaderType );
+	//check for error
+	if ( shaderObj == 0 ) {
+		fprintf( stderr, "Error creating shader: %d\n", shaderType );
+	}
+
+	//get and set the source
+	const GLchar* code[ 1 ];
+	code[ 0 ] = source;
+	GLint lengths[ 1 ];
+	lengths[ 0 ] = strlen( source );
+	glShaderSource( shaderObj, 1, code, lengths );
+
+	//compile shader and check for errors
+	glCompileShader( shaderObj );
+	GLint success;
+	glGetShaderiv( shaderObj, GL_COMPILE_STATUS, &success );
+	if ( !success ) {
+		GLchar infoLog[ 1024 ];
+		glGetShaderInfoLog( shaderObj, sizeof( infoLog ), NULL, infoLog );
+	    fprintf( stderr, "Error compiling shader type %d: %s\n", shaderType, infoLog );
+	}
+
+	glAttachShader( shaderProgram, shaderObj );
+	
+}
+
+void initShaders() {
+	//create the shader program
+	GLuint shaderProgram = glCreateProgram();
+
+	if ( shaderProgram == 0 ) {
+		fprintf( stderr, "Error creating shader program\n" );
+	}
+
+	//add vertex and fragment shader to program
+	addShader( shaderProgram, VertexText, GL_VERTEX_SHADER );
+	addShader( shaderProgram, FragmentText, GL_FRAGMENT_SHADER );
+
+	glBindAttribLocation( shaderProgram, 0, "in_Position" );
+	//error vars
+	GLint success;
+	GLchar errorLog[ 1024 ];
+
+	//link the program
+	glLinkProgram( shaderProgram );
+	glGetProgramiv( shaderProgram, GL_LINK_STATUS, &success );
+	if ( success == 0 ) {
+		glGetProgramInfoLog( shaderProgram, sizeof( errorLog ), NULL, errorLog );
+		fprintf( stderr, "Error linking shader program: %s\n", errorLog );
+	}
+
+	
+    glValidateProgram(shaderProgram);
+    glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, sizeof(errorLog), NULL, errorLog);
+        fprintf(stderr, "Invalid shader program: '%s'\n", errorLog);
+        exit(1);
+    }
+
+	//enable program for use
+    glUseProgram(shaderProgram);
+
+}
+
+
 int main() {
 	//initialize sf context
 	sf::ContextSettings settings;
@@ -24,6 +112,8 @@ int main() {
 	//init glew
 	glewExperimental = GL_TRUE;
 	glewInit();
+
+	initShaders();
 
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
