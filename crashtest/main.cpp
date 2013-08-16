@@ -27,13 +27,12 @@ int main() {
 
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
-	GLuint VBO, IBO;
+	GLuint VBO;
 
 	//initialise vertex and index buffer
 	float Vertices[] = { -0.8f, -0.8f, 0.0f,
 		0.0f, 0.8f, 0.0f,
 		0.8f, -0.8f, 0.0f };
-	unsigned int Indices[] = { 0, 1, 2 };
 
 	//vertex Buffer
 	glGenBuffers( 1, &VBO );
@@ -59,8 +58,6 @@ int main() {
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 		glDrawArrays( GL_TRIANGLES, 0, 3 );
 		glDisableVertexAttribArray( 0 );
-		//glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IBO );
-		//glDrawElements( GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0 );
 
 		window.display();
 
