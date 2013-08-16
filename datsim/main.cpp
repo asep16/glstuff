@@ -73,6 +73,7 @@ void initShaders() {
 	addShader( shaderProgram, VertexText, GL_VERTEX_SHADER );
 	addShader( shaderProgram, FragmentText, GL_FRAGMENT_SHADER );
 
+	glBindAttribLocation( shaderProgram, 0, "in_Position" );
 	//error vars
 	GLint success;
 	GLchar errorLog[ 1024 ];
