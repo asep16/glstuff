@@ -1,2 +1,2 @@
 all:  *.cpp
-	g++ *.cpp  -lGL -lGLEW -lGLU -lsfml-window -lsfml-system
+	g++ *.cpp  -lGL -lGLEW -lGLU -lsfml-window -lsfml-system -g

@@ -21,6 +21,7 @@ void main() { \n\
 const char* FragmentText = " \n\
 #version 140\n\
 \n\
+in vec4 ex_Color; \n\
 out vec4 FragColor;\n\
 \n\
 void main() {\n\
@@ -69,7 +70,8 @@ void initShaders() {
 	addShader( shaderProgram, VertexText, GL_VERTEX_SHADER );
 	addShader( shaderProgram, FragmentText, GL_FRAGMENT_SHADER );
 
-	glBindAttribLocation( shaderProgram, 0, "in_Position" );
+	//glBindAttribLocation( shaderProgram, 0, "in_Position" );
+	//glBindFragDataLocation( shaderProgram, 0, "ex_Color" );
 	//error vars
 	GLint success;
 	GLchar errorLog[ 1024 ];
@@ -117,18 +119,20 @@ int main() {
 
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
-	GLuint VBO;
+	GLuint VBO, VAO;
 
 	//initialise vertex and index buffer
 	float Vertices[] = { -0.8f, -0.8f, 0.0f,
 		0.0f, 0.8f, 0.0f,
 		0.8f, -0.8f, 0.0f };
 
+	//vertex array object
+	glGenVertexArrays( 1, &VAO );
+	glBindVertexArray( VAO );
 	//vertex Buffer
 	glGenBuffers( 1, &VBO );
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );
-
 
 	bool running = true;
 	while ( running ) {
