@@ -14,6 +14,7 @@ private:
 
 	GLuint VBO;
 	GLuint IBO;
+	GLuint VAO;
 public:
 	Tetrahedron();
 	float getX() { return x; };

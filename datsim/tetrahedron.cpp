@@ -17,6 +17,9 @@ Tetrahedron::Tetrahedron() {
 							   4, 3, 0	}; */
 
 	//vertex Buffer
+	glGenVertexArrays( 1, &VAO );
+	glBindVertexArray( VAO );
+
 	glGenBuffers( 1, &VBO );
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );

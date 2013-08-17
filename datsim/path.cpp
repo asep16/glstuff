@@ -20,6 +20,9 @@ Path::Path() {
 			//cout << Vertices[ i ] << " " << Vertices[ i + 1 ] << " " << Vertices[ i + 2 ] << endl;
 		//cout << i << endl;
 	}	
+
+	glGenVertexArrays( 1, &VAO );
+	glBindVertexArray( VAO );
  	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
@@ -30,7 +33,7 @@ void Path::render() {
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 
-	glDrawArrays( GL_LINE_STRIP, std::max( pathIndex - 500, 0 ), 500  );
+	glDrawArrays( GL_LINE_STRIP, std::max( pathIndex - 500, 0 ), ( pathIndex - 500 ) > 0 ? 500 : pathIndex  );
 
 	glDisableVertexAttribArray( 0 );
 }

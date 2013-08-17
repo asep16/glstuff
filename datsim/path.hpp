@@ -10,6 +10,7 @@ class Path
 {
 private:
 	GLuint VBO;
+	GLuint VAO;
 public:
 	int maxPathIndex;
 	int pathIndex;
