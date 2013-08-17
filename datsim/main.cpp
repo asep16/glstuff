@@ -152,8 +152,8 @@ int main() {
 	window.setVerticalSyncEnabled( true );
 
 	//init opengl/glew
-	glewInit();
 	glewExperimental = GL_TRUE;
+	glewInit();
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f  );
 
 	Tetrahedron tetra;
