@@ -117,7 +117,7 @@ int main() {
 
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
-	GLuint VBO;
+	GLuint VBO, VAO;
 
 	//initialise vertex and index buffer
 	float Vertices[] = { -0.8f, -0.8f, 0.0f,
@@ -125,6 +125,9 @@ int main() {
 		0.8f, -0.8f, 0.0f };
 
 	//vertex Buffer
+	glGenVertexArrays( 1, &VAO );
+	glBindVertexArray( VAO );
+
 	glGenBuffers( 1, &VBO );
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );
