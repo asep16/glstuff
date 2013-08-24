@@ -11,22 +11,22 @@
 
 Quadcopter::Quadcopter() {
 	
-	float XVertices[] = { 0.5f, 0.0f, 0.5f,
-						  -0.5f, 0.0f, -0.5f,
-						  -0.5f, 0.0f, 0.5f,
-						  0.5f, 0.0f, -0.5f };
+	float XVertices[] = { 0.5f / 4.0f, 0.0f, 0.5f / 4.0f,
+						  -0.5f / 4.0f, 0.0f, -0.5f / 4.0f,
+						  -0.5f / 4.0f, 0.0f, 0.5f / 4.0f,
+						  0.5f / 4.0f, 0.0f, -0.5f / 4.0f };
 							
 							//upper square
-	float cubeVertices[] = { 0.1f, 0.1f, 0.1f,
-							 -0.1f, 0.1f, 0.1f,
-							 -0.1f, -0.1f, 0.1f,
-							 0.1f, -0.1f, 0.1f,
+	float cubeVertices[] = { 0.1f / 4.0f, 0.1f / 4, 0.1f / 4,
+							 -0.1f / 4, 0.1f / 4, 0.1f / 4,
+							 -0.1f / 4, -0.1f / 4, 0.1f  / 4,
+							 0.1f / 4, -0.1f / 4, 0.1f / 4,
 
 							 //lower square
-							 0.1f, 0.1f, -0.1f,
-							 -0.1f, 0.1f, -0.1f,
-							 -0.1f, -0.1f, -0.1f,
-							 0.1f, -0.1f, -0.1f };
+							 0.1f / 4, 0.1f / 4, -0.1f / 4,
+							 -0.1f / 4, 0.1f / 4, -0.1f / 4,
+							 -0.1f / 4, -0.1f / 4, -0.1f / 4,
+							 0.1f / 4, -0.1f / 4, -0.1f / 4 };
 
 	unsigned int cubeIndices[] = { //top side
 								   0, 1, 2,
@@ -77,22 +77,22 @@ void Quadcopter::render( glm::mat4 mvp ) {
 	glBindVertexArray( XVAO );
 	glDrawArrays( GL_LINES, 0, 4 );
 
-	glm::mat4 trans = glm::translate( 0.5f, 0.0f, 0.5f );
+	glm::mat4 trans = glm::translate( 0.5f / 4, 0.0f, 0.5f / 4 );
 	glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &( mvp * trans )[0][0] );
 	glBindVertexArray( cubeVAO );
 	glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
 	//model.render();
-	trans = glm::translate( -0.5f, 0.0f, -0.5f );
+	trans = glm::translate( -0.5f / 4, 0.0f, -0.5f / 4 );
 	glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &( mvp * trans )[0][0] );
 	glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
 
 
-	trans = glm::translate( 0.5f, 0.0f, -0.5f );
+	trans = glm::translate( 0.5f / 4, 0.0f, -0.5f / 4 );
 	glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &( mvp * trans )[0][0] );
 	glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
 
 
-	trans = glm::translate( -0.5f, 0.0f, 0.5f );
+	trans = glm::translate( -0.5f / 4, 0.0f, 0.5f / 4 );
 	glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &( mvp * trans )[0][0] );
 	glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0 );
 }
@@ -111,9 +111,9 @@ void Quadcopter::update( float elapsedTime ) {
 
 glm::mat4 Quadcopter::getModelMatrix() {
 	glm::mat4 translationMatrix = glm::translate( xPos, yPos, zPos );
-	glm::mat4 rotX = glm::rotate( xRot * 180.0f / (float)M_PI, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-	glm::mat4 rotY = glm::rotate( yRot * 180.0f / (float)M_PI, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-	glm::mat4 rotZ = glm::rotate( zRot * 180.0f / (float)M_PI, glm::vec3( 0.0f, 0.0f, 1.0f ) );
+	glm::mat4 rotX = glm::rotate( -xRot * 180.0f / (float)M_PI, glm::vec3( 1.0f, 0.0f, 0.0f ) );
+	glm::mat4 rotY = glm::rotate( -yRot * 180.0f / (float)M_PI, glm::vec3( 0.0f, 1.0f, 0.0f ) );
+	glm::mat4 rotZ = glm::rotate( -zRot * 180.0f / (float)M_PI, glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
 	return translationMatrix * rotZ * rotY * rotX;
 }

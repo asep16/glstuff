@@ -8,7 +8,7 @@
 
 Path::Path() {
 	//read the path data from file
-	pathData = readScientificMatrix( "comb.txt" );
+	pathData = readScientificMatrix( "comb5.txt" );
 
 	//generate vertices from data
 	float Vertices[ pathData[ 0 ].size() * 3 ];

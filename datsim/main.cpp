@@ -1,6 +1,5 @@
 #include <SFML/Window.hpp>
-#include <GL/glew.h>
-#include <SFML/OpenGL.hpp>
+#include <GL/glew.h> #include <SFML/OpenGL.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <glm/glm.hpp> 
@@ -10,9 +9,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <cstring>
 //project headers
+#include "globals.hpp"
 #include "tetrahedron.hpp"
 #include "quadcopter.hpp"
-#include "globals.hpp"
 
 const char* VertexText = " \n\
 #version 140 \n\
