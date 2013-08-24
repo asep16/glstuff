@@ -14,8 +14,8 @@ Path::Path() {
 	float Vertices[ pathData[ 0 ].size() * 3 ];
 	for ( int i = 0; i < pathData[ 0 ].size(); i++ ) {
 		Vertices[ 3 * i ] = pathData[ 1 ][ i ];
-		Vertices[ 3 * i + 1 ] = pathData[ 2 ][ i ];
-		Vertices[ 3 * i + 2 ] = pathData[ 3 ][ i ];
+		Vertices[ 3 * i + 1 ] = pathData[ 3 ][ i ];
+		Vertices[ 3 * i + 2 ] = pathData[ 2 ][ i ];
 		//if ( i < 4000 && i > 3000 )
 			//cout << Vertices[ i ] << " " << Vertices[ i + 1 ] << " " << Vertices[ i + 2 ] << endl;
 		//cout << i << endl;
@@ -26,16 +26,14 @@ Path::Path() {
  	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray( 0 );
+	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 }
 
 void Path::render() {
-	glEnableVertexAttribArray( 0 );
-	glBindBuffer( GL_ARRAY_BUFFER, VBO );
-	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-
+	glBindVertexArray( VAO );
 	glDrawArrays( GL_LINE_STRIP, std::max( pathIndex - 500, 0 ), ( pathIndex - 500 ) > 0 ? 500 : pathIndex  );
 
-	glDisableVertexAttribArray( 0 );
 }
 
 std::vector< float > Path::getPositionInterpolation( float elapsedTime ) {
@@ -78,7 +76,7 @@ std::vector< float > Path::getPositionInterpolation( float elapsedTime ) {
 			result.push_back( pathData[ i ][ maxIndex ] );
 		}
 	}
-	std::cout <<  result[ 0 ] << " " << elapsedTime << " " << index << " " << result[ 3 ] << std::endl;
+	//std::cout <<  result[ 0 ] << " " << elapsedTime << " " << index << " " << result[ 3 ] << std::endl;
 	pathIndex = index;
 	maxPathIndex = maxIndex;
 	return result;

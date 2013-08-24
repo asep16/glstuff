@@ -2,6 +2,6 @@
 #define _GLOBALS_HPP
 #include <SFML/OpenGL.hpp>
 
-GLuint uniformLocation;
+extern GLuint uniformLocation;
 
 #endif

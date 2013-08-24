@@ -21,8 +21,12 @@ public:
 	float yRot;
 	float zRot;
 
+	GLuint XVAO, cubeVAO;
+	GLuint XVBO, cubeVBO;
+	GLuint XIBO, cubeIBO;
+
 	void update( float elapsedTime );
-	void render();
+	void render( glm::mat4 mvp );
 	glm::mat4 getModelMatrix();
 };
 

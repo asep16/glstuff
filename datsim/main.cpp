@@ -3,14 +3,16 @@
 #include <SFML/OpenGL.hpp>
 #include <iostream>
 #include <stdio.h>
-#include <glm/glm.hpp>
+#include <glm/glm.hpp> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <cstring>
 //project headers
-#include "globals.hpp"
 #include "tetrahedron.hpp"
 #include "quadcopter.hpp"
+#include "globals.hpp"
 
 const char* VertexText = " \n\
 #version 140 \n\
@@ -182,6 +184,17 @@ int main() {
 	int count;
 	sf::Clock timer;
 	sf::Clock simTime;
+
+	glm::vec4 camUp = glm::vec4( 0.0f, 0.1f, 0.0f, 0.0f );
+
+	glm::vec2  prevMouse;
+
+	glm::vec4 cameraPos = glm::vec4( 1.0f, 1.0f, -3.0f, 0.0f );
+	glm::vec4 camOrig = glm::vec4( 1.0f, 1.0f, -3.0f, 0.0f );
+	float hRot = 0.0f;
+	float vRot = 0.0f;
+	float rotAmount = 0.0f;
+
 	while( running ) {
 		if ( clock.getElapsedTime() < sf::milliseconds( 16 ) )
 			continue;
@@ -194,10 +207,45 @@ int main() {
 		}
 		clock.restart();
 
+		//get mouse window coords
+		glm::vec2 curMouse = prevMouse;
+		if ( sf::Mouse::isButtonPressed( sf::Mouse::Left ) ) {
+			sf::Vector2i derp = sf::Mouse::getPosition( window );
+			curMouse.x = derp.x;
+			curMouse.y = derp.y; 
+			curMouse.x = std::max( -1.0f, std::min( ( curMouse.x - width / 2.0f ) / ( width / 2.0f ), 1.0f ) );
+			curMouse.y = -std::max( -1.0f, std::min( ( curMouse.y - height / 2.0f ) / ( height / 2.0f ), 1.0f ) ); //y axis is reversed
+		}
+
+		glm::vec2  mouseDiff = prevMouse - curMouse;
+
+		
+		if ( glm::length( mouseDiff ) > 0.001f ) {
+			hRot += mouseDiff.x;
+			vRot += mouseDiff.y;
+
+			if ( abs( hRot ) >= 1.0f )
+				hRot = 0.0f;
+			if ( abs( vRot ) >= 1.0f )
+				vRot = 0.0f;
+
+			glm::quat rotMat = glm::quat( glm::vec3( vRot * 2 * M_PI , hRot * 2 * M_PI  , 0.0f ) );
+
+			cameraPos = rotMat * camOrig;
+			camUp = glm::normalize( rotMat * glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f ) );
+
+			
+		}
+		prevMouse = curMouse;
+
+		std::cout << vRot << " " << camUp.y << " " << camUp.z << std::endl;
+
+
+		//quad.update( simTime.getElapsedTime().asSeconds() );
 		quad.update( simTime.getElapsedTime().asSeconds() );
 		scale += 0.010f;
 		glm::mat4 projectionMatrix = glm::perspective( 70.0f, (float)width/height, 0.1f, 100.0f );
-		cameraMatrix = glm::lookAt( glm::vec3(  quad.xPos +1.0f, quad.yPos +1.0f,  quad.zPos -3.0f  ), glm::vec3( quad.xPos, quad.yPos, quad.zPos ), glm::vec3( 0.0f, 1.0f, 0.0f ) );
+		cameraMatrix = glm::lookAt( glm::vec3(  quad.xPos + cameraPos.x, quad.yPos +cameraPos.y,  quad.zPos + cameraPos.z  ), glm::vec3( quad.xPos, quad.yPos, quad.zPos ), glm::vec3( camUp.x, camUp.y, camUp.z ) );
 		translationMatrix = glm::translate( 0.0f, 0.0f , 0.0f  );
 		rotationMatrix = glm::rotate( 100 * scale , glm::vec3( 1.0, 1.0, 1.0 ) );
 		scalingMatrix = glm::scale( 1.0, 1.0, 1.0 );
@@ -222,7 +270,7 @@ int main() {
 		srt = quad.getModelMatrix();
 		mvp = projectionMatrix * cameraMatrix * srt;
 		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
-		quad.render();
+		quad.render( mvp );
 
 		srt = quad.path.getModelMatrix();
 		mvp = projectionMatrix * cameraMatrix * srt;
