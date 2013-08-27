@@ -1,5 +1,6 @@
 #include <SFML/Window.hpp>
-#include <GL/glew.h> #include <SFML/OpenGL.hpp>
+#include <GL/glew.h>
+#include <SFML/OpenGL.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <glm/glm.hpp> 
@@ -186,13 +187,18 @@ int main() {
 
 	glm::vec4 camUp = glm::vec4( 0.0f, 0.1f, 0.0f, 0.0f );
 
-	glm::vec2  prevMouse;
 
-	glm::vec4 cameraPos = glm::vec4( 1.0f, 1.0f, -3.0f, 0.0f );
-	glm::vec4 camOrig = glm::vec4( 1.0f, 1.0f, -3.0f, 0.0f );
+	glm::vec4 camOrig = glm::vec4( 0.0f, 0.0f, -1.0f, 0.0f );
+	float camRadius = 5.0f;
+	glm::vec4 cameraPos = glm::vec4( 0.0f, 0.0f, -1.0f, 0.0f ) * camRadius;
+
 	float hRot = 0.0f;
 	float vRot = 0.0f;
 	float rotAmount = 0.0f;
+	glm::vec2 curMouse;
+	glm::vec2 prevMouse;
+
+	bool updateMouse = false;
 
 	while( running ) {
 		if ( clock.getElapsedTime() < sf::milliseconds( 16 ) )
@@ -206,38 +212,66 @@ int main() {
 		}
 		clock.restart();
 
+		//do event handling first
+		sf::Event event;
+		while( window.pollEvent( event ) ) {
+			if ( event.type == sf::Event::Closed )
+				running = false;
+			else if ( event.type == sf::Event::Resized ) {
+				glViewport( 0, 0, event.size.width, event.size.height );
+				height = event.size.height;
+				width = event.size.width;
+			}
+			else if ( event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left ) {
+				updateMouse = true;
+				sf::Vector2i derp = sf::Mouse::getPosition( window );
+				prevMouse.x = derp.x;
+				prevMouse.y = derp.y; 
+				prevMouse.x = std::max( -1.0f, std::min( ( prevMouse.x - width / 2.0f ) / ( width / 2.0f ), 1.0f ) );
+				prevMouse.y = -std::max( -1.0f, std::min( ( prevMouse.y - height / 2.0f ) / ( height / 2.0f ), 1.0f ) ); //y axis is reversed
+
+			}
+			else if ( event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left ) {
+				updateMouse = false;
+			}
+			else if ( event.type == sf::Event::MouseWheelMoved ) {
+				camRadius = std::max( camRadius + event.mouseWheel.delta, 1.0f );
+			}
+		}
+		
+
 		//get mouse window coords
-		glm::vec2 curMouse = prevMouse;
-		if ( sf::Mouse::isButtonPressed( sf::Mouse::Left ) ) {
+		if ( updateMouse ) {
+			curMouse = prevMouse;
 			sf::Vector2i derp = sf::Mouse::getPosition( window );
 			curMouse.x = derp.x;
 			curMouse.y = derp.y; 
 			curMouse.x = std::max( -1.0f, std::min( ( curMouse.x - width / 2.0f ) / ( width / 2.0f ), 1.0f ) );
 			curMouse.y = -std::max( -1.0f, std::min( ( curMouse.y - height / 2.0f ) / ( height / 2.0f ), 1.0f ) ); //y axis is reversed
-		}
-
-		glm::vec2  mouseDiff = prevMouse - curMouse;
-
-		
-		if ( glm::length( mouseDiff ) > 0.001f ) {
-			hRot += mouseDiff.x;
-			vRot += mouseDiff.y;
-
-			if ( abs( hRot ) >= 1.0f )
-				hRot = 0.0f;
-			if ( abs( vRot ) >= 1.0f )
-				vRot = 0.0f;
-
-			glm::quat rotMat = glm::quat( glm::vec3( vRot * 2 * M_PI , hRot * 2 * M_PI  , 0.0f ) );
-
-			cameraPos = rotMat * camOrig;
-			camUp = glm::normalize( rotMat * glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f ) );
+			glm::vec2  mouseDiff = prevMouse - curMouse;
 
 			
-		}
-		prevMouse = curMouse;
+			if ( glm::length( mouseDiff ) > 0.001f ) {
+				hRot += mouseDiff.x;
+				vRot += mouseDiff.y;
 
-		std::cout << vRot << " " << camUp.y << " " << camUp.z << std::endl;
+				if ( abs( hRot ) >= 1.0f )
+					hRot = 0.0f;
+				if ( abs( vRot ) >= 1.0f )
+					vRot = 0.0f;
+
+
+				
+			}
+			prevMouse = curMouse;
+		}
+
+		glm::quat rotMat = glm::quat( glm::vec3( vRot * 2 * M_PI , hRot * 2 * M_PI  , 0.0f ) );
+
+		cameraPos = rotMat * camOrig * camRadius;
+		camUp = glm::normalize( rotMat * glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f ) );
+
+		
 
 
 		//quad.update( simTime.getElapsedTime().asSeconds() );
@@ -252,16 +286,6 @@ int main() {
 		mvp = projectionMatrix * cameraMatrix * srt;
 		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
 
-		sf::Event event;
-		while( window.pollEvent( event ) ) {
-			if ( event.type == sf::Event::Closed )
-				running = false;
-			else if ( event.type == sf::Event::Resized ) {
-				glViewport( 0, 0, event.size.width, event.size.height );
-				height = event.size.height;
-				width = event.size.width;
-			}
-		}
 
 		glClear( GL_COLOR_BUFFER_BIT );
 

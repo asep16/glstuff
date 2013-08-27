@@ -58,16 +58,18 @@ std::vector< float > Path::getPositionInterpolation( float elapsedTime ) {
 			index++;
 	}
 
-	int deltaTime = 0;
+	float deltaTime = 0;
+	float timeDiff = 0.0f;
 
 	if ( index <= maxIndex - 1 ) {
-		deltaTime = pathData[ 0 ][ index ] - elapsedTime;
+		deltaTime = elapsedTime - pathData[ 0 ][ index ];
+		timeDiff = pathData[ 0 ][ index + 1 ] - pathData[ 0 ][ index ];
 		//add time to result
 		result.push_back( elapsedTime );
 
 		//add position and rotation to result
 		for ( int i = 1; i < 7; i++ ) {
-			result.push_back( pathData[ i ][ index ] + ( pathData[ i ][ index + 1 ] - pathData[ i ][ index ] ) * deltaTime );
+			result.push_back( pathData[ i ][ index ] + ( pathData[ i ][ index + 1 ] - pathData[ i ][ index ] ) * deltaTime / timeDiff );
 		}
 	}
 	else {
@@ -76,7 +78,7 @@ std::vector< float > Path::getPositionInterpolation( float elapsedTime ) {
 			result.push_back( pathData[ i ][ maxIndex ] );
 		}
 	}
-	//std::cout <<  result[ 0 ] << " " << elapsedTime << " " << index << " " << result[ 3 ] << std::endl;
+	//std::cout <<  result[ 0 ] << " " << deltaTime << " " << index << " " << result[ 3 ] << std::endl;
 	pathIndex = index;
 	maxPathIndex = maxIndex;
 	return result;
