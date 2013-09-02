@@ -115,7 +115,7 @@ glm::mat4 Quadcopter::getModelMatrix() {
 	glm::mat4 rotY = glm::rotate( -yRot * 180.0f / (float)M_PI, glm::vec3( 0.0f, 1.0f, 0.0f ) );
 	glm::mat4 rotZ = glm::rotate( -zRot * 180.0f / (float)M_PI, glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
-	return translationMatrix * rotZ * rotY * rotX;
+	return translationMatrix *  rotY * rotZ * rotX;
 }
 	
 	

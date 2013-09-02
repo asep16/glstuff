@@ -1,6 +1,7 @@
 #include <SFML/Window.hpp>
 #include <GL/glew.h>
 #include <SFML/OpenGL.hpp>
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <glm/glm.hpp>
@@ -108,7 +109,7 @@ int main() {
 	settings.minorVersion = 1;
 
 	//initialize sf window with above settings
-	sf::Window window( sf::VideoMode( 800, 600 ), "OpenGL", sf::Style::Default, settings );
+	sf::RenderWindow window( sf::VideoMode( 800, 600 ), "OpenGL", sf::Style::Default, settings );
 	window.setVerticalSyncEnabled( true );
 
 	//init glew
@@ -137,6 +138,17 @@ int main() {
 	glBindBuffer( GL_ARRAY_BUFFER, VBO );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );
 
+	sf::Font font;
+	font.loadFromFile( "DejaVuSansMono.ttf" );
+
+	sf::Text text;
+	text.setFont( font );
+	text.setString( "Hello World!" );
+	text.setCharacterSize( 24 );
+	text.setColor( sf::Color::Green );
+
+	text.setStyle( sf::Text::Bold | sf::Text::Underlined );
+
 	bool running = true;
 	while ( running ) {
 
@@ -155,6 +167,10 @@ int main() {
 		glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 		glDrawArrays( GL_TRIANGLES, 0, 3 );
 		glDisableVertexAttribArray( 0 );
+
+		window.pushGLStates();
+		window.draw( text );
+		window.popGLStates();
 
 		window.display();
 

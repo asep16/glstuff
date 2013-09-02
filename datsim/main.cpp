@@ -1,6 +1,7 @@
 #include <SFML/Window.hpp>
 #include <GL/glew.h>
 #include <SFML/OpenGL.hpp>
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <glm/glm.hpp> 
@@ -9,6 +10,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <cstring>
+#include <sstream>
 //project headers
 #include "globals.hpp"
 #include "tetrahedron.hpp"
@@ -145,12 +147,20 @@ void testDraw( float x, float y, float z ) {
 }
 
 
+template <class T>
+inline std::string toString( const T t ) {
+	std::stringstream ss;
+	ss << t;
+	return ss.str();
+}
+
+
 int main() {
 	//set up OpenGL context
 	sf::ContextSettings settings = setupSettings();
 
 	//set up sfml window bound to OpenGL
-	sf::Window window( sf::VideoMode( 800, 600 ), "OpenGL", sf::Style::Default, settings );
+	sf::RenderWindow window( sf::VideoMode( 800, 600 ), "OpenGL", sf::Style::Default, settings );
 	window.setVerticalSyncEnabled( true );
 
 	//init opengl/glew
@@ -162,7 +172,6 @@ int main() {
 	Quadcopter quad;
 
 	initShaders();
-
 
 	sf::Clock clock;
 	bool running = true;
@@ -200,6 +209,17 @@ int main() {
 
 	bool updateMouse = false;
 
+
+	sf::Font font;
+	if ( !font.loadFromFile( "DejaVuSansMono.ttf" ) ) {
+		std::cout << "error loading dejavu font" << std::endl;
+	}
+
+	sf::Text text;
+	text.setFont( font );
+	text.setCharacterSize( 12 );
+	text.setColor( sf::Color::Green );
+
 	while( running ) {
 		if ( clock.getElapsedTime() < sf::milliseconds( 16 ) )
 			continue;
@@ -221,6 +241,7 @@ int main() {
 				glViewport( 0, 0, event.size.width, event.size.height );
 				height = event.size.height;
 				width = event.size.width;
+				window.setView( sf::View( sf::FloatRect( 0, 0, event.size.width, event.size.height ) ) );
 			}
 			else if ( event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left ) {
 				updateMouse = true;
@@ -274,6 +295,7 @@ int main() {
 		
 
 
+		glUseProgram( 1 );
 		//quad.update( simTime.getElapsedTime().asSeconds() );
 		quad.update( simTime.getElapsedTime().asSeconds() );
 		scale += 0.010f;
@@ -299,7 +321,34 @@ int main() {
 		mvp = projectionMatrix * cameraMatrix * srt;
 		glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, &mvp[0][0] );
 		quad.path.render();
-		//gluCylinder( gluNewQuadric(), 2, 2, 2, 32, 32 );
+
+		glBindVertexArray( 0 );
+		glUseProgram( 0 );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
+		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+
+
+		window.pushGLStates();
+		text.setPosition( 0, 0 );
+		text.setString( "X position: " + toString( quad.xPos ) );
+		window.draw( text );
+		text.move( 0, 14 );
+		text.setString( "Y position: " + toString( quad.yPos ) );
+		window.draw( text );
+		text.move( 0, 14 );
+		text.setString( "Z position: " + toString( quad.zPos ) );
+		window.draw( text );
+		text.move( 0, 14 );
+		text.setString( "X axis rotation: " + toString( quad.xRot * 180.0f / M_PI ) );
+		window.draw( text );
+		text.move( 0, 14 );
+		text.setString( "Y axis rotation: " + toString( quad.yRot * 180.0f / M_PI ) );
+		window.draw( text );
+		text.move( 0, 14 );
+		text.setString( "Z axis rotation: " + toString( quad.yRot * 180.0f / M_PI ) );
+		window.draw(text);
+		window.popGLStates();
+
 		//swap buffers, displaying the backbuffer
 		window.display();
 	} 
